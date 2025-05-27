@@ -15,7 +15,7 @@ public class Test { // Clase principal de prueba
 
         // --- Versión Secuencial ---
         long startSec = System.nanoTime(); // Captura el tiempo inicial en nanosegundos
-        MergeSortSecuencial.mergeSort(dataSec, 0, dataSec.length - 1); // Llama al algoritmo Merge Sort secuencial
+        MergeSortSecuencial.mergeSortSecuencial(dataSec, 0, dataSec.length - 1); // Llama al algoritmo Merge Sort secuencial
         long endSec = System.nanoTime();   // Captura el tiempo después de ordenar
 
         System.out.println("Secuencial: " + Arrays.toString(dataSec)); // Muestra el arreglo ordenado secuencialmente
@@ -38,3 +38,5 @@ public class Test { // Clase principal de prueba
         System.out.println("Tiempo concurrente (ns): " + (endConc - startConc)); // Muestra el tiempo de ejecución concurrente
     }
 }
+
+

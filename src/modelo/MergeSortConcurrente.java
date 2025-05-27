@@ -12,21 +12,17 @@ public class MergeSortConcurrente extends Thread { // La clase extiende Thread, 
         this.left = left;         // Guarda el índice izquierdo del subarreglo
         this.right = right;       // Guarda el índice derecho del subarreglo
     }
-
     // Método que se ejecuta al iniciar el hilo
     @Override
     public void run() {
         if (left < right) { // Condición base de recursión: mientras haya más de un elemento
             int middle = (left + right) / 2; // Calcula el punto medio del subarreglo
-
             // Crea subprocesos para ordenar recursivamente la mitad izquierda y derecha
             MergeSortConcurrente leftSorter = new MergeSortConcurrente(array, left, middle);
             MergeSortConcurrente rightSorter = new MergeSortConcurrente(array, middle + 1, right);
-
             // Inicia ambos hilos concurrentes
             leftSorter.start();
             rightSorter.start();
-
             try {
                 // Espera a que ambos hilos terminen antes de continuar con el merge
                 leftSorter.join();

@@ -3,12 +3,12 @@ package modelo; // Define que esta clase pertenece al paquete 'modelo'
 public class MergeSortSecuencial { // Clase pública que implementa el algoritmo Merge Sort secuencial
 
     // Método principal de Merge Sort (divide el arreglo en mitades)
-    public static void mergeSort(int[] array, int left, int right) {
+    public static void mergeSortSecuencial(int[] array, int left, int right) {
         if (left < right) { // Verifica si hay más de un elemento en el subarreglo
             int middle = (left + right) / 2; // Calcula el índice medio para dividir el arreglo
 
-            mergeSort(array, left, middle);       // Ordena recursivamente la mitad izquierda
-            mergeSort(array, middle + 1, right);  // Ordena recursivamente la mitad derecha
+            mergeSortSecuencial(array, left, middle);       // Ordena recursivamente la mitad izquierda
+            mergeSortSecuencial(array, middle + 1, right);  // Ordena recursivamente la mitad derecha
 
             merge(array, left, middle, right); // Une (merge) ambas mitades ya ordenadas
         }
