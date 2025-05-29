@@ -1,42 +1,60 @@
 package test; // Declara que esta clase pertenece al paquete 'test'
 
-import java.util.Arrays; // Importa la clase Arrays para usar métodos como toString()
+import java.util.Arrays; // Importa Arrays para mostrar arreglos como texto
+import java.util.Random; // Importa Random para generar números aleatorios
+import modelo.MergeSortSecuencial; // Importa la clase del algoritmo secuencial
+import modelo.MergeSortConcurrente; // Importa la clase del algoritmo concurrente
 
-import modelo.MergeSortSecuencial;   // Importa la clase que contiene el algoritmo Merge Sort secuencial
-import modelo.MergeSortConcurrente;  // Importa la clase que contiene el algoritmo Merge Sort concurrente
+public class Test { // Declaración de la clase principal
 
-public class Test { // Clase principal de prueba
+    public static void main(String[] args) { // Método principal
 
-    public static void main(String[] args) { // Método principal del programa
+        int size = 10; // Tamaño por defecto del arreglo si no se pasa argumento
 
-        // Arreglo de prueba para ambas versiones del algoritmo
-        int[] dataSec = {5, 3, 8, 4, 2, 7, 1, 6}; // Crea un arreglo de enteros desordenado
-        int[] dataConc = dataSec.clone(); // Crea una copia exacta para la versión concurrente
-
-        // --- Versión Secuencial ---
-        long startSec = System.nanoTime(); // Captura el tiempo inicial en nanosegundos
-        MergeSortSecuencial.mergeSortSecuencial(dataSec, 0, dataSec.length - 1); // Llama al algoritmo Merge Sort secuencial
-        long endSec = System.nanoTime();   // Captura el tiempo después de ordenar
-
-        System.out.println("Secuencial: " + Arrays.toString(dataSec)); // Muestra el arreglo ordenado secuencialmente
-        System.out.println("Tiempo secuencial (ns): " + (endSec - startSec)); // Muestra el tiempo de ejecución en nanosegundos
-
-        // --- Versión Concurrente ---
-        long startConc = System.nanoTime(); // Captura el tiempo inicial para la versión concurrente
-        MergeSortConcurrente sorter = new MergeSortConcurrente(dataConc, 0, dataConc.length - 1); // Crea un hilo con el algoritmo concurrente
-        sorter.start(); // Inicia la ejecución del hilo (llama a run() en un hilo separado)
-
-        try {
-            sorter.join(); // Espera a que el hilo termine antes de continuar (bloquea el hilo principal)
-        } catch (InterruptedException e) {
-            e.printStackTrace(); // Imprime el error si el hilo fue interrumpido
+        // Verifica si se pasó un argumento (como tamaño del arreglo)
+        if (args.length > 0) {
+            try {
+                size = Integer.parseInt(args[0]); // Intenta convertir el argumento a entero
+            } catch (NumberFormatException e) {
+                System.out.println("Argumento inválido, usando tamaño por defecto de 10."); // Muestra mensaje si falla
+            }
         }
 
-        long endConc = System.nanoTime(); // Captura el tiempo después de que el hilo haya terminado
+        // Genera un arreglo de enteros aleatorios del tamaño especificado
+        int[] dataSec = generarArregloAleatorio(size); // Arreglo para la versión secuencial
+        int[] dataConc = dataSec.clone(); // Copia exacta del arreglo para la versión concurrente
 
-        System.out.println("Concurrente: " + Arrays.toString(dataConc)); // Muestra el arreglo ordenado concurrentemente
-        System.out.println("Tiempo concurrente (ns): " + (endConc - startConc)); // Muestra el tiempo de ejecución concurrente
+        // --- Versión Secuencial ---
+        long startSec = System.currentTimeMillis(); // Toma el tiempo antes de ejecutar el algoritmo (en milisegundos)
+        MergeSortSecuencial.mergeSortSecuencial(dataSec, 0, dataSec.length - 1); // Ejecuta Merge Sort secuencial
+        long endSec = System.currentTimeMillis(); // Toma el tiempo después de ejecutar
+
+        // Muestra el arreglo ordenado y el tiempo de ejecución
+        System.out.println("Secuencial: " + Arrays.toString(dataSec));
+        System.out.println("Tiempo secuencial (ms): " + (endSec - startSec));
+
+        // --- Versión Concurrente ---
+     // --- Versión Concurrente ---
+        long startConc = System.currentTimeMillis(); // Toma el tiempo inicial para el concurrente
+
+        MergeSortConcurrente.ordenar(dataConc); // ✅ Usamos el método estático que maneja el ForkJoinPool
+
+        long endConc = System.currentTimeMillis(); // Tiempo final
+
+        // Muestra el arreglo ordenado y el tiempo de ejecución concurrente
+        System.out.println("Concurrente: " + Arrays.toString(dataConc));
+        System.out.println("Tiempo concurrente (ms): " + (endConc - startConc));
+    }
+
+    // Método auxiliar para generar un arreglo aleatorio de tamaño dado
+    public static int[] generarArregloAleatorio(int size) {
+        Random rand = new Random(); // Crea una instancia de generador aleatorio
+        int[] arreglo = new int[size]; // Declara el arreglo
+
+        for (int i = 0; i < size; i++) {
+            arreglo[i] = rand.nextInt(1000); // Llena cada posición con un número aleatorio entre 0 y 999
+        }
+
+        return arreglo; // Devuelve el arreglo generado
     }
 }
-
-

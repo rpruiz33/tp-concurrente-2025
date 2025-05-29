@@ -1,42 +1,51 @@
-package modelo; // Define el paquete donde se encuentra la clase
+package modelo; // Declara que esta clase pertenece al paquete 'modelo'
 
-public class MergeSortConcurrente extends Thread { // La clase extiende Thread, por lo que cada instancia puede ejecutarse como un hilo
+import java.util.concurrent.RecursiveAction; // Importa la clase base para tareas sin retorno
+import java.util.concurrent.ForkJoinPool;    // Importa el pool de hilos que ejecuta tareas en paralelo
 
+// Clase que implementa el algoritmo Merge Sort de forma concurrente usando Fork/Join
+public class MergeSortConcurrente extends RecursiveAction {
     private int[] array; // Arreglo que se va a ordenar
-    private int left;    // Índice izquierdo del subarreglo
-    private int right;   // Índice derecho del subarreglo
+    private int left;    // Índice inicial del subarreglo a ordenar
+    private int right;   // Índice final del subarreglo a ordenar
 
-    // Constructor que inicializa el arreglo y los índices a ordenar
+    private static final int UMBRAL = 500; // Umbral mínimo para dividir tareas; debajo de este se usa ordenamiento secuencial
+
+    // Constructor: inicializa la tarea con el arreglo y los límites a ordenar
     public MergeSortConcurrente(int[] array, int left, int right) {
-        this.array = array;       // Guarda referencia al arreglo a ordenar
-        this.left = left;         // Guarda el índice izquierdo del subarreglo
-        this.right = right;       // Guarda el índice derecho del subarreglo
+        this.array = array;   // Guarda el arreglo a ordenar
+        this.left = left;     // Guarda el índice izquierdo
+        this.right = right;   // Guarda el índice derecho
     }
-    // Método que se ejecuta al iniciar el hilo
-    @Override
-    public void run() {
-        if (left < right) { // Condición base de recursión: mientras haya más de un elemento
-            int middle = (left + right) / 2; // Calcula el punto medio del subarreglo
-            // Crea subprocesos para ordenar recursivamente la mitad izquierda y derecha
-            MergeSortConcurrente leftSorter = new MergeSortConcurrente(array, left, middle);
-            MergeSortConcurrente rightSorter = new MergeSortConcurrente(array, middle + 1, right);
-            // Inicia ambos hilos concurrentes
-            leftSorter.start();
-            rightSorter.start();
-            try {
-                // Espera a que ambos hilos terminen antes de continuar con el merge
-                leftSorter.join();
-                rightSorter.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace(); // En caso de interrupción, imprime la traza de error
-            }
 
-            // Una vez ordenadas ambas mitades, se combinan en orden
-            merge(array, left, middle, right);
+    // Método obligatorio que ejecuta la tarea cuando se llama compute()
+    @Override
+    protected void compute() {
+        // Si el tamaño del segmento es menor al umbral, se ordena secuencialmente
+        if (right - left < UMBRAL) {
+            MergeSortSecuencial.mergeSortSecuencial(array, left, right); // Ordenamiento secuencial tradicional
+        } else {
+            int mid = (left + right) / 2; // Calcula el índice del medio del segmento
+
+            // Crea dos subtareas para dividir el trabajo: una para la mitad izquierda y otra para la mitad derecha
+            MergeSortConcurrente leftTask = new MergeSortConcurrente(array, left, mid);       // Subtarea izquierda
+            MergeSortConcurrente rightTask = new MergeSortConcurrente(array, mid + 1, right); // Subtarea derecha
+
+            // Ejecuta ambas tareas en paralelo y espera a que ambas terminen
+            invokeAll(leftTask, rightTask);
+
+            // Después de que ambas mitades están ordenadas, se mezclan (merge)
+            merge(array, left, mid, right);
         }
     }
 
-    // Método que combina dos subarreglos ya ordenados (función estándar de Merge Sort)
+    
+    // Método estático para ordenar un arreglo completo usando ForkJoinPool
+    public static void ordenar(int[] array) {
+        ForkJoinPool pool = ForkJoinPool.commonPool(); // Obtiene el pool común del sistema (reutilizable, eficiente)
+        pool.invoke(new MergeSortConcurrente(array, 0, array.length - 1)); // Lanza la tarea principal
+    }
+ // Método para mezclar dos subarreglos ordenados: array[left..mid] y array[mid+1..right]
     private static void merge(int[] array, int left, int middle, int right) {
         int n1 = middle - left + 1; // Tamaño del subarreglo izquierdo
         int n2 = right - middle;    // Tamaño del subarreglo derecho
@@ -65,4 +74,10 @@ public class MergeSortConcurrente extends Thread { // La clase extiende Thread, 
             array[k++] = R[j++];
         }
     }
-}
+
+
+
+}   
+
+
+
