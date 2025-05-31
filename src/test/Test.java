@@ -9,7 +9,7 @@ public class Test { // Declaración de la clase principal
 
     public static void main(String[] args) { // Método principal
 
-        int size = 10; // Tamaño por defecto del arreglo si no se pasa argumento
+        int size = 10000000; // Tamaño por defecto del arreglo si no se pasa argumento
 
         // Verifica si se pasó un argumento (como tamaño del arreglo)
         if (args.length > 0) {
@@ -30,7 +30,7 @@ public class Test { // Declaración de la clase principal
         long endSec = System.currentTimeMillis(); // Toma el tiempo después de ejecutar
 
         // Muestra el arreglo ordenado y el tiempo de ejecución
-        System.out.println("Secuencial: " + Arrays.toString(dataSec));
+       //System.out.println("Secuencial: " + Arrays.toString(dataSec));
         System.out.println("Tiempo secuencial (ms): " + (endSec - startSec));
 
         // --- Versión Concurrente ---
@@ -42,7 +42,7 @@ public class Test { // Declaración de la clase principal
         long endConc = System.currentTimeMillis(); // Tiempo final
 
         // Muestra el arreglo ordenado y el tiempo de ejecución concurrente
-        System.out.println("Concurrente: " + Arrays.toString(dataConc));
+        //System.out.println("Concurrente: " + Arrays.toString(dataConc));
         System.out.println("Tiempo concurrente (ms): " + (endConc - startConc));
     }
 
